@@ -12,7 +12,9 @@ int execute_command(char *command)
 
     if (pid == 0)
     {
-        if (execlp(command, command, NULL) == -1)
+        char *argv[MAX_ARG_SIZE];       /* An array to store command and arguments */
+        parse_arguments(command, argv); /* Implement a function to parse arguments */
+        if (execve(argv[0], argv, NULL) == -1)
             return -1; /* Command not found */
     }
     else
