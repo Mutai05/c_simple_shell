@@ -12,9 +12,21 @@ int execute_command(char *command)
 
     if (pid == 0)
     {
-        char *argv[MAX_ARG_SIZE];       /* An array to store command and arguments */
-        parse_arguments(command, argv); /* Implement a function to parse arguments */
-        if (execve(argv[0], argv, NULL) == -1)
+        char *command_name = strtok(command, " "); /* Extract the command name */
+        char *argv[MAX_ARG_SIZE];                  /* An array to store command and arguments */
+
+        int i = 0;
+
+        while (command_name != NULL)
+        {
+            argv[i] = command_name;
+            i++;
+            command_name = strtok(NULL, " ");
+        }
+
+        argv[i] = NULL; /* Null-terminate the array */
+
+        if (execvp(argv[0], argv) == -1)
             return -1; /* Command not found */
     }
     else
