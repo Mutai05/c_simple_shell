@@ -3,15 +3,17 @@
 
 void parse_arguments(char *input, char *argv[])
 {
+    int i; /* Declare 'i' before the loop */
+
     /* Initialize the argv array to NULL pointers */
-    for (int i = 0; i < MAX_ARG_SIZE; i++)
+    for (i = 0; i < MAX_ARG_SIZE; i++)
     {
         argv[i] = NULL;
     }
 
     /* Tokenize the input line using whitespace as the delimiter */
     char *token = strtok(input, " ");
-    int i = 0;
+    i = 0; /* Reuse 'i' for the loop */
 
     while (token != NULL)
     {
