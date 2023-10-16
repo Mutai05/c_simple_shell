@@ -9,6 +9,7 @@
 #include <sys/wait.h>
 
 #define MAX_INPUT_SIZE 1024
+#define MAX_ARG_SIZE 64
 
 int execute_command(char *command);
 void print_prompt(void);
