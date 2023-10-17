@@ -13,5 +13,6 @@
 
 int execute_command(char *command);
 void print_prompt(void);
+int custom_getline(char *buffer, size_t size);
 
 #endif /* HEADER_FILE_H */
