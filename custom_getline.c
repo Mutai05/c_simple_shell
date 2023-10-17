@@ -23,36 +23,13 @@ ssize_t custom_getline(char **lineptr, size_t *n, FILE *stream)
     {
         c = fgetc(stream);
 
-        if (c == EOF || c == '\n')
+        if (c == EOF)
         {
-            if (c == EOF && (!buffer || len == 0))
+            if (len == 0)
             {
                 return -1; /* No more data to read */
             }
-
-            if (len + 1 >= size)
-            {
-                size = (len + 1) * 2;
-                new_buffer = (char *)realloc(buffer, size);
-
-                if (!new_buffer)
-                {
-                    free(buffer);
-                    return -1; /* Allocation error */
-                }
-
-                buffer = new_buffer;
-            }
-
-            if (c == EOF)
-            {
-                buffer[len] = '\0';
-                break;
-            }
-
-            buffer[len] = '\n';
-            buffer[len + 1] = '\0';
-            break;
+            break; /* End of line */
         }
 
         if (len + 1 >= size)
@@ -70,8 +47,14 @@ ssize_t custom_getline(char **lineptr, size_t *n, FILE *stream)
         }
 
         buffer[len] = (char)c;
-        buffer[len + 1] = '\0';
         len++;
+    }
+
+    /* Check if a newline character is present at the end */
+    if (len > 0 && buffer[len - 1] == '\n')
+    {
+        buffer[len - 1] = '\0'; /* Remove trailing newline */
+        len--;
     }
 
     *lineptr = buffer;
