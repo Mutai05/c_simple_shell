@@ -5,6 +5,8 @@
 
 #define MAX_INPUT_SIZE 1024
 
+/* Does not work */
+
 ssize_t custom_getline(char **lineptr, size_t *n, FILE *stream)
 {
     char *buffer = NULL;
