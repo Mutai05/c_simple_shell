@@ -107,10 +107,26 @@ int execute_command(char *command)
 
             argv[i] = NULL; /* Null-terminate the array */
 
-            if (execvp(argv[0], argv) == -1)
+            if (strcmp(argv[0], "exit") == 0)
             {
-                perror("execvp failed");
-                return -1; /* Command not found */
+                /* Check for the "exit" command */
+                if (i > 1)
+                {
+                    int exit_status = atoi(argv[1]);
+                    exit(exit_status);
+                }
+                else
+                {
+                    exit(0); /* No argument provided, exit with the default status (0) */
+                }
+            }
+            else
+            {
+                if (execvp(argv[0], argv) == -1)
+                {
+                    perror("execvp failed");
+                    return -1; /* Command not found */
+                }
             }
         }
         else
