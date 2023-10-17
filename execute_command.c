@@ -57,10 +57,12 @@ int execute_command(char *command)
 
         if (pid == 0)
         {
-            char *command_name = strtok(command, " "); /* Extract the command name */
-            char *argv[MAX_ARG_SIZE];                  /* An array to store command and arguments */
+            /* Extract the command name */
+            char *command_name = strtok(command, " ");
+            char *argv[MAX_ARG_SIZE]; /* An array to store command and arguments */
             int i = 0;
 
+            /* Tokenize the command and arguments */
             while (command_name != NULL)
             {
                 argv[i] = command_name;
