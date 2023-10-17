@@ -6,15 +6,14 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
-/* Declare the external environment variable array */
-extern char **environ;
-
 int execute_command(char *command)
 {
     char *path = getenv("PATH");
-    char *token, *cmd;
     char path_copy[MAX_INPUT_SIZE];
     int command_found = 0; /* Flag to check if the command exists */
+    char *token;
+    char *cmd;
+    int token_start = 0;
 
     if (path == NULL)
     {
@@ -25,46 +24,42 @@ int execute_command(char *command)
     strncpy(path_copy, path, sizeof(path_copy));
     path_copy[sizeof(path_copy) - 1] = '\0';
 
-    token = strtok(path_copy, ":");
+    token = path_copy;
 
-    while (token != NULL)
+    while (path_copy[token_start] != '\0')
     {
-        cmd = malloc(strlen(token) + strlen(command) + 2);
-        if (cmd == NULL)
+        if (path_copy[token_start] == ':')
         {
-            perror("Malloc failed");
-            return -1;
-        }
-        sprintf(cmd, "%s/%s", token, command);
+            path_copy[token_start] = '\0'; /* Null-terminate the token */
+            cmd = malloc(strlen(token) + strlen(command) + 2);
 
-        if (access(cmd, X_OK) == 0)
-        {
-            /* Command is accessible, execute it */
+            if (cmd == NULL)
+            {
+                perror("Malloc failed");
+                return -1;
+            }
+
+            sprintf(cmd, "%s/%s", token, command);
+
+            if (access(cmd, X_OK) == 0)
+            {
+                /* Command is accessible, execute it */
+                free(cmd);
+                command_found = 1; /* Set the flag to indicate command existence */
+                break;
+            }
+
             free(cmd);
-            command_found = 1; /* Set the flag to indicate command existence */
-            break;
+            token_start++;
+            token = path_copy + token_start;
         }
-
-        free(cmd);
-        token = strtok(NULL, ":");
-    }
-
-    if (strcmp(command, "exit") == 0)
-    {
-        /* If the command is "exit", exit the shell */
-        exit(0);
-    }
-    else if (strcmp(command, "env") == 0)
-    {
-        /* If the command is "env", print the environment */
-        char **env = environ;
-        while (*env)
+        else
         {
-            printf("%s\n", *env);
-            env++;
+            token_start++;
         }
     }
-    else if (command_found)
+
+    if (command_found)
     {
         pid_t pid = fork();
         if (pid < 0)
@@ -76,16 +71,38 @@ int execute_command(char *command)
         if (pid == 0)
         {
             /* Extract the command name */
-            char *command_name = strtok(command, " ");
+            char *command_name = command;
             char *argv[MAX_ARG_SIZE]; /* An array to store command and arguments */
             int i = 0;
 
-            /* Tokenize the command and arguments */
-            while (command_name != NULL)
+            while (*command_name != '\0')
             {
+                /* Skip leading spaces */
+                while (*command_name == ' ')
+                {
+                    command_name++;
+                }
+
+                if (*command_name == '\0')
+                {
+                    break;
+                }
+
+                /* Save the current argument */
                 argv[i] = command_name;
                 i++;
-                command_name = strtok(NULL, " ");
+
+                /* Find the end of the current argument */
+                while (*command_name != ' ' && *command_name != '\0')
+                {
+                    command_name++;
+                }
+
+                if (*command_name != '\0')
+                {
+                    *command_name = '\0'; /* Null-terminate the argument */
+                    command_name++;
+                }
             }
 
             argv[i] = NULL; /* Null-terminate the array */
@@ -108,5 +125,4 @@ int execute_command(char *command)
         fprintf(stderr, "Command not found: %s\n", command);
         return -1;
     }
-    return -1;
 }
