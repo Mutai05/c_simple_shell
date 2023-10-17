@@ -46,7 +46,12 @@ int execute_command(char *command)
         token = strtok(NULL, ":");
     }
 
-    if (command_found)
+    if (strcmp(command, "exit") == 0)
+    {
+        /* If the command is "exit", exit the shell */
+        exit(0);
+    }
+    else if (command_found)
     {
         pid_t pid = fork();
         if (pid < 0)
