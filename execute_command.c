@@ -109,7 +109,7 @@ int execute_command(char *command)
 
             if (strcmp(argv[0], "exit") == 0)
             {
-                /* Check for the "exit" command */
+                /* Handle the "exit" command */
                 if (i > 1)
                 {
                     int exit_status = atoi(argv[1]);
@@ -118,6 +118,40 @@ int execute_command(char *command)
                 else
                 {
                     exit(0); /* No argument provided, exit with the default status (0) */
+                }
+            }
+            else if (strcmp(argv[0], "setenv") == 0)
+            {
+                /* Handle the "setenv" command */
+                if (argv[1] != NULL && argv[2] != NULL)
+                {
+                    if (setenv(argv[1], argv[2], 1) != 0)
+                    {
+                        perror("setenv");
+                        return -1; /* Print an error message and return -1 on failure */
+                    }
+                }
+                else
+                {
+                    fprintf(stderr, "Usage: setenv VARIABLE VALUE\n");
+                    return -1; /* Print usage message and return -1 on incorrect syntax */
+                }
+            }
+            else if (strcmp(argv[0], "unsetenv") == 0)
+            {
+                /* Handle the "unsetenv" command */
+                if (argv[1] != NULL)
+                {
+                    if (unsetenv(argv[1]) != 0)
+                    {
+                        perror("unsetenv");
+                        return -1; /* Print an error message and return -1 on failure */
+                    }
+                }
+                else
+                {
+                    fprintf(stderr, "Usage: unsetenv VARIABLE\n");
+                    return -1; /* Print usage message and return -1 on incorrect syntax */
                 }
             }
             else
