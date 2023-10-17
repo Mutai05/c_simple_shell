@@ -6,6 +6,9 @@
 #include <sys/types.h>
 #include <sys/wait.h>
 
+/* Declare the external environment variable array */
+extern char **environ;
+
 int execute_command(char *command)
 {
     char *path = getenv("PATH");
@@ -51,6 +54,16 @@ int execute_command(char *command)
         /* If the command is "exit", exit the shell */
         exit(0);
     }
+    else if (strcmp(command, "env") == 0)
+    {
+        /* If the command is "env", print the environment */
+        char **env = environ;
+        while (*env)
+        {
+            printf("%s\n", *env);
+            env++;
+        }
+    }
     else if (command_found)
     {
         pid_t pid = fork();
@@ -95,4 +108,5 @@ int execute_command(char *command)
         fprintf(stderr, "Command not found: %s\n", command);
         return -1;
     }
+    return -1;
 }
